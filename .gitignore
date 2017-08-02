@@ -1,3 +1,7 @@
 *.pyc
 node_modules/
 static/bower_components/
+package-lock.json
+venv/
+.idea/
+docker.env

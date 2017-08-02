@@ -1,0 +1,43 @@
+publish:
+  ecr:
+    when:
+      branch: $$DEFAULT_BRANCH
+    access_key: $$AWS_ACCESS_KEY
+    secret_key: $$AWS_SECRET_KEY
+    region: us-east-1
+    repo: quintoandar/powerbi-dashboards
+    storage_driver: overlay
+    tag:
+      - $$BRANCH-$$BUILD_NUMBER
+      - $$BRANCH-latest
+deploy:
+  marathon:
+    when:
+      branch: $$DEFAULT_BRANCH
+    image: quintoandar/drone-marathon
+    server: http://master.mesos:8080
+    app_config:
+      id: powerbi-dashboards/app
+      cmd: python ./app.py
+      uris:
+      - http://internal.lb.maintenance.marathon.mesos:10002/docker.tar.gz
+      container:
+        type: DOCKER
+        docker:
+          image: 632540934959.dkr.ecr.us-east-1.amazonaws.com/quintoandar/powerbi-dashboards:$$BRANCH-$$BUILD_NUMBER
+          network: BRIDGE
+          portMappings:
+          - hostPort: 0
+            containerPort: 5000
+          forcePullImage: true
+      healthChecks:
+      - protocol: MESOS_HTTP
+        path: "/"
+        portIndex: 0
+        timeoutSeconds: 20
+        gracePeriodSeconds: 300
+        intervalSeconds: 60
+        maxConsecutiveFailures: 3
+      labels:
+        HAPROXY_GROUP: internal,external
+        HAPROXY_0_VHOST: judite.$$DEFAULT_BRANCH_DOMAINquintoandar.com.br
