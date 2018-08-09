@@ -51,3 +51,5 @@ uwsgi --http :5000 --wsgi-file app.py
 List the available dashboards: http(s)://YOUR_HOST/list-dashboards
 
 Access your dashboard: http(s)://YOUR_HOST/?dashboard_id=your_dashboard_id
+
+Update credentials in DC/OS service: powerbi-dashboards
